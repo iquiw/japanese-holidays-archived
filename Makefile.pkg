@@ -1,0 +1,76 @@
+#######################################################
+# $Id: Makefile.pkg 450 2004-01-08 03:21:15Z kose $
+#
+# Copyright (C) 2005 The Meadow Team
+# Author: KOSEKI Yoshinori <kose@meadowy.org>
+#
+
+# makefile for pakage.
+# (original lisp version)-(pkg version)-pkg.tar.bz2
+
+# make install
+# make uninstall
+# make pkg
+# make maintainer-clean
+
+PKG=japanese-holidays-1.0
+PKG_VERSION=1
+BASE=japanese-holidays
+PKG_URL= 
+PKG_PATCH=
+PKG_PKGINFO="URL: -"
+TARGET=japanese-holidays.elc
+
+#########
+MAKEDIR = $(firstword $(dir $(MAKEFILE_LIST)))
+include $(MAKEDIR)../meadow.defs
+
+MAKE_OPTIONS=LISPDIR=$(LISPDIR) EMACS=$(EMACS)
+PKGDIR=$(PREFIX)/packages
+PKGINFO=$(PKGDIR)/pkginfo
+PWD=
+
+###
+PREARG=-batch -q -no-site-file -eval "(set-language-environment \"Japanese\")" -eval "(setq default-buffer-file-coding-system 'iso-2022-7bit-unix)"
+POSTARG=-eval "(texinfo-format-buffer)" -eval "(save-buffer)" 
+
+install: $(LISPDIR)/$(BASE)/$(TARGET)
+
+$(LISPDIR)/$(BASE)/$(TARGET):
+	cp -p $(MAKEDIR)japanese-holidays.el .
+	mkdir -p $(LISPDIR)/$(BASE)
+	$(EMACS) -q -batch -no-site-file -eval '(byte-compile-file "japanese-holidays.el")'
+	cp -p $(BASE).el $(LISPDIR)/$(BASE)/
+	cp $(BASE).elc $(LISPDIR)/$(BASE)/
+
+
+uninstall:
+	rm -rf $(LISPDIR)/$(BASE)
+	rm -rf $(PKGDIR)/pkginfo/$(BASE)
+
+pkg: $(PKG)-$(PKG_VERSION)-pkg.tar.bz2
+
+$(PKG)-$(PKG_VERSION)-pkg.tar.bz2 : $(LISPDIR)/$(BASE)/$(TARGET)
+	rm -rf $(PKGINFO)/$(BASE)
+	if test ! -d $(PKGINFO)/$(BASE); then mkdir -p $(PKGINFO)/$(BASE); fi
+	cp -p $(MAKEDIR)Makefile.pkg $(PKGINFO)/$(BASE)
+	cp -p $(MAKEDIR)auto-autoloads.el $(PKGINFO)/$(BASE)
+	echo $(PKG_PKGINFO) > $(PKGINFO)/$(BASE)/_pkginfo
+	chmod 666 $(PKGINFO)/$(BASE)/*
+	tar -C $(PREFIX) -cf $(basename $@) packages/lisp/$(BASE) \
+		packages/pkginfo/$(BASE) $(PKG_INFO)
+#	echo packages/pkginfo/$(BASE)/MANIFEST > $(PKGINFO)/$(BASE)/MANIFEST
+#	tar tf $(basename $@) >> $(PKGINFO)/$(BASE)/MANIFEST
+#	tar -C $(PREFIX) -uf $(basename $@) packages/pkginfo/$(BASE)/MANIFEST
+	rm -f $(basename $@).bz2
+	bzip2 --best $(basename $@)
+	@echo "version: $(PKG)-$(PKG_VERSION)"
+	@echo "install: packages/$(basename $@).bz2 "`ls -l $(basename $@).bz2 | awk '{print $$5}'`
+	md5sum $(basename $@).bz2
+
+PKG_INFO=
+
+maintainer-clean:
+	rm -rf $(PKG) $(PKG).tar.gz
+
+# end

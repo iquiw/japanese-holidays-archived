@@ -32,9 +32,8 @@
 (eval-when-compile
   (require 'cl)
   (defvar displayed-month)
-  (defvar displayed-year))
-
-(require 'holidays)
+  (defvar displayed-year)
+  (require 'calendar))
 
 (autoload 'solar-equinoxes/solstices "solar")
 
@@ -266,7 +265,7 @@ See the documentation for `calendar-holidays' for details."
 			    (filter-visible-calendar-holidays nationals)))))
   holidays)
 
-(defvar calendar-weekend '(0 6)
+(defvar calendar-weekend '(0)
   "*List of days of week to be marked as holiday.")
 
 (defvar calendar-weekend-marker nil)
@@ -291,21 +290,21 @@ See the documentation for `calendar-holidays' for details."
 	 (setq sunday (+ sunday 7))))
      (increment-calendar-month m y 1))))
 
-(unless noninteractive
-  (setq calendar-weekend-marker calendar-holiday-marker
-	calendar-holidays (append japanese-holidays
-				  local-holidays
-				  other-holidays))
-
-  (add-hook 'today-visible-calendar-hook 'calendar-mark-weekend)
-  (add-hook 'today-visible-calendar-hook 'mark-calendar-holidays)
-  (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
-  (add-hook 'today-invisible-calendar-hook 'calendar-mark-weekend)
-  (add-hook 'today-invisible-calendar-hook 'mark-calendar-holidays)
-
-  (setq mark-holidays-in-calendar t)	  ; 休日のマーク
-  (setq mark-diary-entries-in-calendar t) ; calendar 上で予定のある日を表示
-  )
+;; (unless noninteractive
+;;   (setq calendar-weekend-marker calendar-holiday-marker
+;; 	calendar-holidays (append japanese-holidays
+;; 				  local-holidays
+;; 				  other-holidays))
+;; 
+;;   (add-hook 'today-visible-calendar-hook 'calendar-mark-weekend)
+;;   (add-hook 'today-visible-calendar-hook 'mark-calendar-holidays)
+;;   (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
+;;   (add-hook 'today-invisible-calendar-hook 'calendar-mark-weekend)
+;;   (add-hook 'today-invisible-calendar-hook 'mark-calendar-holidays)
+;; 
+;;   (setq mark-holidays-in-calendar t)	  ; 休日のマーク
+;;   (setq mark-diary-entries-in-calendar t) ; calendar 上で予定のある日を表示
+;;   )
 
 
 (provide 'japanese-holidays)
