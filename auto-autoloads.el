@@ -1,8 +1,8 @@
-;;; $MEADOW/packages/pkginfo/japanese-holidays/auto-autoloads.el
-
+;;; $Id: auto-autoloads.el 750 2005-10-07 07:58:02Z kose $
+;;;
+;;; packages/pkginfo/japanese-holidays/auto-autoloads.el
 ;;; Copyright (C) 2005 The Meadow Team
-
-;; Author: KOSEKI Yoshinori <kose@meadowy.org>
+;;; Author: KOSEKI Yoshinori <kose@meadowy.org>
 
 ;; japanese-holidays.el は必ず byte-compile すること。
 (add-hook 'calendar-load-hook
