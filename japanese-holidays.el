@@ -26,6 +26,25 @@
 ;;
 ;; Original program created by T. Hattori 1999/4/20
 
+;; このプログラムは、calender で表示出来る様に日本の祝日を設定します。
+;; 使用するには、このファイルを load-path の通った所に置き、~/.emacs に
+;; 以下の設定を追加します。
+
+;;  (add-hook 'calendar-load-hook
+;;            (lambda ()
+;;              (require 'japanese-holidays)
+;;              (setq calendar-holidays
+;;                    (append japanese-holidays local-holidays other-holidays))))
+;;  (setq mark-holidays-in-calendar t)
+
+;; “きょう”をマークするには以下の設定を追加します。
+;;  (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
+
+;; 日曜日を赤字にする場合、以下の設定を追加します。
+;;  (setq calendar-weekend-marker 'diary)
+;;  (add-hook 'today-visible-calendar-hook 'calendar-mark-weekend)
+;;  (add-hook 'today-invisible-calendar-hook 'calendar-mark-weekend)
+
 ;;; Code:
 ;;
 
@@ -33,14 +52,13 @@
   (require 'cl)
   (defvar displayed-month)
   (defvar displayed-year)
-  (require 'calendar))
+  (when noninteractive
+    (require 'holidays)))
 
 (autoload 'solar-equinoxes/solstices "solar")
 
 (defcustom japanese-holidays
   '(;; 明治6年太政官布告第344号
-    ;; 休日ニ関スル件 (大正元年勅令第19号)
-    ;; 休日ニ関スル件 (昭和2年勅令第25号)
     (holiday-range
      (holiday-fixed 1 3 "元始祭") '(10 14 1873) '(7 20 1948))
     (holiday-range
@@ -49,101 +67,106 @@
      (holiday-fixed 1 30 "孝明天皇祭") '(10 14 1873) '(9 3 1912))
     (holiday-range
      (holiday-fixed 2 11 "紀元節") '(10 14 1873) '(7 20 1948))
+    (holiday-range
+     (holiday-fixed 4 3 "神武天皇祭") '(10 14 1873) '(7 20 1948))
+    (holiday-range
+     (holiday-fixed 9 17 "神嘗祭") '(10 14 1873) '(7 5 1879))
+    (holiday-range
+     (holiday-fixed 11 3 "天長節") '(10 14 1873) '(9 3 1912))
+    (holiday-range
+     (holiday-fixed 11 23 "新嘗祭") '(10 14 1873) '(7 20 1948))
+    ;; 明治11年太政官布告23号
     (let* ((equinox (solar-equinoxes/solstices 0 displayed-year))
 	   (m (extract-calendar-month equinox))
 	   (d (truncate (extract-calendar-day equinox))))
       (holiday-range
        (holiday-fixed m d "春季皇霊祭") '(6 5 1878) '(7 20 1948)))
-    (holiday-range
-     (holiday-fixed 4 3 "神武天皇祭") '(10 14 1873) '(7 20 1948))
-    (holiday-range
-     (holiday-fixed 4 29 "天長節") '(3 3 1927) '(7 20 1948))
-    (holiday-range
-     (holiday-fixed 7 30 "明治天皇祭") '(9 3 1912) '(3 3 1927))
-    (holiday-range
-     (holiday-fixed 8 31 "天長節") '(9 3 1912) '(3 3 1927))
     (let* ((equinox (solar-equinoxes/solstices 2 displayed-year))
 	   (m (extract-calendar-month equinox))
 	   (d (truncate (extract-calendar-day equinox))))
       (holiday-range
        (holiday-fixed m d "秋季皇霊祭") '(6 5 1878) '(7 20 1948)))
-    (holiday-range
-     (holiday-fixed 9 17 "神嘗祭") '(10 14 1873) '(7 5 1879))
+    ;; 明治12年太政官布告27号
     (holiday-range
      (holiday-fixed 10 17 "神嘗祭") '(7 5 1879) '(7 20 1948))
+    ;; 休日ニ関スル件 (大正元年勅令第19号)
+    (holiday-range
+     (holiday-fixed 7 30 "明治天皇祭") '(9 3 1912) '(3 3 1927))
+    (holiday-range
+     (holiday-fixed 8 31 "天長節") '(9 3 1912) '(3 3 1927))
+    ;; 大正2年勅令259号
     (holiday-range
      (holiday-fixed 10 31 "天長節祝日") '(10 31 1913) '(3 3 1927))
+    ;; 休日ニ関スル件改正ノ件 (昭和2年勅令第25号)
     (holiday-range
-     (holiday-fixed 11 3 "天長節") '(10 14 1873) '(9 3 1912))
+     (holiday-fixed 4 29 "天長節") '(3 3 1927) '(7 20 1948))
     (holiday-range
      (holiday-fixed 11 3 "明治節") '(3 3 1927) '(7 20 1948))
     (holiday-range
-     (holiday-fixed 11 23 "新嘗祭") '(10 14 1873) '(7 20 1948))
-    (holiday-range
      (holiday-fixed 12 25 "大正天皇祭") '(3 3 1927) '(7 20 1948))
-    ;; 国民の祝日に関する法律 (昭和23年法律第178号)
-    ;;   国民の祝日に関する法律の一部を改正する法律 (昭和41年法律第86号)
-    ;;   国民の祝日に関する法律の一部を改正する法律 (昭和48年法律第10号)
-    ;;   国民の祝日に関する法律の一部を改正する法律 (昭和60年法律第103号)
-    ;;   国民の祝日に関する法律の一部を改正する法律 (平成元年法律第5号)
-    ;;   国民の祝日に関する法律の一部を改正する法律 (平成7年法律第22号)
-    ;;   国民の祝日に関する法律の一部を改正する法律 (平成10年法律第141号)
-    ;;   国民の祝日に関する法律及び老人福祉法の一部を改正する法律 (平成13年法律第59号)
-    ;;   国民の祝日に関する法律の一部を改正する法律 (平成17年法律第43号)
+    ;; 国民の祝日に関する法律の一部を改正する法律 (昭和60年法律第103号)
     (holiday-national
+     ;; 国民の祝日に関する法律の一部を改正する法律 (昭和48年法律第10号)
      (holiday-substitute
       (nconc
+       ;; 国民の祝日に関する法律 (昭和23年法律第178号)
        (holiday-range
-	(holiday-fixed 1 1 "元旦") '(7 20 1948))
+	(holiday-fixed 1 1 "元日") '(7 20 1948))
        (holiday-range
 	(holiday-fixed 1 15 "成人の日") '(7 20 1947) '(1 1 2000))
-       (holiday-range
-	(holiday-float 1 1 2 "成人の日") '(1 1 2000))
-       ;; 建国記念の日となる日を定める政令 (昭和41年政令第376号)
-       (holiday-range
-	(holiday-fixed 2 11 "建国記念の日") '(6 25 1966))
-       ;; 春分の日は、厳密には前年2月の官報により決定される
        (let* ((equinox (solar-equinoxes/solstices 0 displayed-year))
 	      (m (extract-calendar-month equinox))
 	      (d (truncate (extract-calendar-day equinox))))
+	 ;; 春分の日は、厳密には前年2月の官報により決定される
 	 (holiday-range
 	  (holiday-fixed m d "春分の日") '(7 20 1948)))
        (holiday-range
 	(holiday-fixed 4 29 "天皇誕生日") '(7 20 1948) '(2 17 1989))
        (holiday-range
-	(holiday-fixed 4 29 "みどりの日") '(2 17 1989) '(1 1 2007))
-       (holiday-range
-	(holiday-fixed 4 29 "昭和の日") '(1 1 2007))
-       (holiday-range
 	(holiday-fixed 5 3 "憲法記念日") '(7 20 1948))
        (holiday-range
-	(holiday-fixed 5 4 "みどりの日") '(1 1 2007))
-       (holiday-range
 	(holiday-fixed 5 5 "こどもの日") '(7 20 1948))
-       (holiday-range
-	(holiday-fixed 7 20 "海の日") '(1 1 1996) '(1 1 2003))
-       (holiday-range
-	(holiday-float 7 1 3 "海の日") '(1 1 2003))
-       (holiday-range
-	(holiday-fixed 9 15 "敬老の日") '(6 25 1966) '(1 1 2003))
-       (holiday-range
-	(holiday-float 9 1 3 "敬老の日") '(1 1 2003))
-       ;; 秋分の日は、厳密には前年2月の官報により決定される
        (let* ((equinox (solar-equinoxes/solstices 2 displayed-year))
 	      (m (extract-calendar-month equinox))
 	      (d (truncate (extract-calendar-day equinox))))
+	 ;; 秋分の日は、厳密には前年2月の官報により決定される
 	 (holiday-range
 	  (holiday-fixed m d "秋分の日") '(7 20 1948)))
-       (holiday-range
-	(holiday-fixed 10 10 "体育の日") '(6 25 1966) '(1 1 2000))
-       (holiday-range
-	(holiday-float 10 1 2 "体育の日") '(1 1 2000))
        (holiday-range
 	(holiday-fixed 11 3 "文化の日") '(7 20 1948))
        (holiday-range
 	(holiday-fixed 11 23 "勤労感謝の日") '(7 20 1948))
+       ;; 国民の祝日に関する法律の一部を改正する法律 (昭和41年法律第86号)
+       ;;   建国記念の日となる日を定める政令 (昭和41年政令第376号)
        (holiday-range
-	(holiday-fixed 12 23 "天皇誕生日") '(2 17 1989)))))
+	(holiday-fixed 2 11 "建国記念の日") '(6 25 1966))
+       (holiday-range
+	(holiday-fixed 9 15 "敬老の日") '(6 25 1966) '(1 1 2003))
+       (holiday-range
+	(holiday-fixed 10 10 "体育の日") '(6 25 1966) '(1 1 2000))
+       ;; 国民の祝日に関する法律の一部を改正する法律 (平成元年法律第5号)
+       (holiday-range
+	(holiday-fixed 4 29 "みどりの日") '(2 17 1989) '(1 1 2007))
+       (holiday-range
+	(holiday-fixed 12 23 "天皇誕生日") '(2 17 1989))
+       ;; 国民の祝日に関する法律の一部を改正する法律 (平成7年法律第22号)
+       (holiday-range
+	(holiday-fixed 7 20 "海の日") '(1 1 1996) '(1 1 2003))
+       ;; 国民の祝日に関する法律の一部を改正する法律 (平成10年法律第141号)
+       (holiday-range
+	(holiday-float 1 1 2 "成人の日") '(1 1 2000))
+       (holiday-range
+	(holiday-float 10 1 2 "体育の日") '(1 1 2000))
+       ;; 国民の祝日に関する法律及び老人福祉法の一部を改正する法律 (平成13年法律第59号)
+       (holiday-range
+	(holiday-float 7 1 3 "海の日") '(1 1 2003))
+       (holiday-range
+	(holiday-float 9 1 3 "敬老の日") '(1 1 2003))
+       ;; 国民の祝日に関する法律の一部を改正する法律 (平成17年法律第43号)
+       (holiday-range
+	(holiday-fixed 4 29 "昭和の日") '(1 1 2007))
+       (holiday-range
+	(holiday-fixed 5 4 "みどりの日") '(1 1 2007)))))
     (filter-visible-calendar-holidays
      '(;; 皇太子明仁親王の結婚の儀の行われる日を休日とする法律 (昭和34年法律第16号)
        ((4 10 1959) "明仁親王の結婚の儀")
@@ -168,8 +191,9 @@ See the documentation for `calendar-holidays' for details."
   :type 'string
   :group 'holidays)
 
-(defun holiday-make-sortable (date)
-  (+ (* (nth 2 date) 10000) (* (nth 0 date) 100) (nth 1 date)))
+(eval-and-compile
+  (defun holiday-make-sortable (date)
+    (+ (* (nth 2 date) 10000) (* (nth 0 date) 100) (nth 1 date))))
 
 (defun holiday-range (holidays &optional from to)
   (let ((from (and from (holiday-make-sortable from)))
@@ -204,7 +228,8 @@ See the documentation for `calendar-holidays' for details."
     (dolist (holiday holidays)
       (let ((date (car holiday)))
 	(when (and (>= (holiday-make-sortable date)
-		       (holiday-make-sortable '(4 12 1973)))
+		       (eval-when-compile
+			 (holiday-make-sortable '(4 12 1973))))
 		   (= (calendar-day-of-week date) 0))
 	  (setq substitutes
 		(cons
@@ -225,7 +250,8 @@ See the documentation for `calendar-holidays' for details."
 	    (let* ((date (car substitute))
 		   (sortable-date (holiday-make-sortable date)))
 	      (when (>= sortable-date
-			(holiday-make-sortable '(1 1 2007)))
+			(eval-when-compile
+			  (holiday-make-sortable '(1 1 2007))))
 		(setq substitutes
 		      (cons
 		       (list (holiday-add-days date 1) (cadr substitute))
@@ -248,7 +274,9 @@ See the documentation for `calendar-holidays' for details."
 	  (let* ((date (holiday-add-days (car prev) 1))
 		 (sotable-date (holiday-make-sortable date)))
 	    (when (cond
-		   ((>= sotable-date (holiday-make-sortable '(1 1 2007)))
+		   ((>= sotable-date
+			(eval-when-compile
+			  (holiday-make-sortable '(1 1 2007))))
 		    (catch 'found
 		      (dolist (holiday (holiday-find-date date holidays))
 			(unless (string-match
@@ -256,7 +284,9 @@ See the documentation for `calendar-holidays' for details."
 				 (cadr holiday))
 			  (throw 'found nil)))
 		      t))
-		   ((>= sotable-date (holiday-make-sortable '(12 27 1985)))
+		   ((>= sotable-date
+			(eval-when-compile
+			  (holiday-make-sortable '(12 27 1985))))
 		    (not (or (= (calendar-day-of-week date) 0)
 			     (holiday-find-date date holidays)))))
 	      (setq nationals (cons (list date holiday-national-name)
@@ -289,22 +319,6 @@ See the documentation for `calendar-holidays' for details."
 		 calendar-weekend)
 	 (setq sunday (+ sunday 7))))
      (increment-calendar-month m y 1))))
-
-;; (unless noninteractive
-;;   (setq calendar-weekend-marker calendar-holiday-marker
-;; 	calendar-holidays (append japanese-holidays
-;; 				  local-holidays
-;; 				  other-holidays))
-;; 
-;;   (add-hook 'today-visible-calendar-hook 'calendar-mark-weekend)
-;;   (add-hook 'today-visible-calendar-hook 'mark-calendar-holidays)
-;;   (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
-;;   (add-hook 'today-invisible-calendar-hook 'calendar-mark-weekend)
-;;   (add-hook 'today-invisible-calendar-hook 'mark-calendar-holidays)
-;; 
-;;   (setq mark-holidays-in-calendar t)	  ; 休日のマーク
-;;   (setq mark-diary-entries-in-calendar t) ; calendar 上で予定のある日を表示
-;;   )
 
 
 (provide 'japanese-holidays)
