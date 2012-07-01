@@ -298,12 +298,12 @@ See the documentation for `calendar-holidays' for details."
   '((((class color) (background light))  :foreground "red")
     (((class color) (background dark))  :foreground "hotpink"))
   "Face for sunday in the calendar."
-  :group calendar-faces)
+  :group 'calendar-faces)
 (defface saturday
   '((((class color) (background light))  :foreground "blue")
     (((class color) (background dark))  :foreground "dodgerblue"))
   "Face for saturday in the calendar."
-  :group calendar-faces)
+  :group 'calendar-faces)
 
 (defvar calendar-sunday-marker 'sunday)
 (defvar calendar-saturday-marker 'saturday)
