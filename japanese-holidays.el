@@ -295,30 +295,39 @@ See the documentation for `calendar-holidays' for details."
 			    (filter-visible-calendar-holidays nationals)))))
   holidays)
 
-(defvar calendar-weekend '(0)
-  "*List of days of week to be marked as holiday.")
+(defface sunday
+  '((((class color) (background light))  :foreground "red")
+    (((class color) (background dark))  :foreground "hotpink"))
+  "Face for sunday in the calendar."
+  :group calendar-faces)
+(defface saturday
+  '((((class color) (background light))  :foreground "blue")
+    (((class color) (background dark))  :foreground "dodgerblue"))
+  "Face for saturday in the calendar."
+  :group calendar-faces)
 
-(defvar calendar-weekend-marker nil)
+(defvar calendar-sunday-marker 'sunday)
+(defvar calendar-saturday-marker 'saturday)
 
 (defun calendar-mark-weekend ()
   (let ((m displayed-month)
-	(y displayed-year))
+        (y displayed-year))
     (increment-calendar-month m y -1)
     (calendar-for-loop
-     i from 1 to 3 do
-     (let ((sunday (- 1 (calendar-day-of-week (list m 1 y))))
-	   (last (calendar-last-day-of-month m y)))
-       (while (<= sunday last)
-	 (mapcar (lambda (x)
-		   (let ((d (+ sunday x)))
-		     (and (<= 1 d)
-			  (<= d last)
-			  (mark-visible-calendar-date
-			   (list m d y)
-			   calendar-weekend-marker))))
-		 calendar-weekend)
-	 (setq sunday (+ sunday 7))))
-     (increment-calendar-month m y 1))))
+      i from 1 to 3 do
+      (let ((sunday (- 1 (calendar-day-of-week (list m 1 y))))
+            (last (calendar-last-day-of-month m y)))
+        (while (<= sunday last)
+          (if (<= 1 sunday)
+              (mark-visible-calendar-date
+               (list m sunday y)
+               calendar-sunday-marker))
+          (if (<= (+ sunday 6) last)
+              (mark-visible-calendar-date
+               (list m (+ sunday 6) y)
+               calendar-saturday-marker))
+          (setq sunday (+ sunday 7))))
+      (increment-calendar-month m y 1))))
 
 
 (provide 'japanese-holidays)
