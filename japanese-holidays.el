@@ -311,9 +311,8 @@ See the documentation for `calendar-holidays' for details."
 (defun calendar-mark-weekend ()
   (let ((m displayed-month)
         (y displayed-year))
-    (increment-calendar-month m y -1)
-    (calendar-for-loop
-      i from 1 to 3 do
+    (calendar-increment-month m y -1)
+    (while (<= m (+ displayed-month 1))
       (let ((sunday (- 1 (calendar-day-of-week (list m 1 y))))
             (last (calendar-last-day-of-month m y)))
         (while (<= sunday last)
@@ -326,7 +325,7 @@ See the documentation for `calendar-holidays' for details."
                (list m (+ sunday 6) y)
                calendar-saturday-marker))
           (setq sunday (+ sunday 7))))
-      (increment-calendar-month m y 1))))
+      (calendar-increment-month m y 1))))
 
 
 (provide 'japanese-holidays)
