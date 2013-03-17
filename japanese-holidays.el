@@ -34,8 +34,8 @@
 ;;            (lambda ()
 ;;              (require 'japanese-holidays)
 ;;              (setq calendar-holidays
-;;                    (append japanese-holidays local-holidays other-holidays))))
-;;  (setq mark-holidays-in-calendar t)
+;;                    (append japanese-holidays local-holidays other-holidays)
+;;                    mark-holidays-in-calendar t)))
 
 ;; “きょう”をマークするには以下の設定を追加します。
 ;;  (add-hook 'calendar-today-visible-hook 'calendar-mark-today)
