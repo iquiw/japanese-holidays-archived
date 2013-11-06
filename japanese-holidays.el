@@ -312,7 +312,7 @@ See the documentation for `calendar-holidays' for details."
   (let ((m displayed-month)
         (y displayed-year))
     (calendar-increment-month m y -1)
-    (while (<= m (+ displayed-month 1))
+    (cl-dotimes (_ 3)
       (let ((sunday (- 1 (calendar-day-of-week (list m 1 y))))
             (last (calendar-last-day-of-month m y)))
         (while (<= sunday last)
